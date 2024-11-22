@@ -12,6 +12,7 @@ namespace PedidosApiWebApplication.Modelos
         public int idProduto { get; set; } //FK
         public int quantidadeItemPedido { get; set; }
         public float precoUnitarioItemPedido { get; set; }
-
+        public virtual Pedido Pedido { get; set; }
+        public virtual Produto Produto { get; set; }
     }
 }

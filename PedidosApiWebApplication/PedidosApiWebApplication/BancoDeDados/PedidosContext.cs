@@ -23,6 +23,17 @@ namespace PedidosApiWebApplication.BancoDeDados
                  .WithMany(c => c.Pedidos)
                  .HasForeignKey(f => f.idPedido);
 
+            modelBuilder.Entity<Pedido>()
+                .HasMany<ItemPedido>()
+                .WithOne(ip => ip.Pedido)
+                .HasForeignKey(f => f.idPedido);
+
+            modelBuilder.Entity<Produto>()
+                .HasMany<ItemPedido>()
+                .WithOne(p => p.Produto)
+                .HasForeignKey(f => f.idProduto);
+                
+                
         }
     }
 }
