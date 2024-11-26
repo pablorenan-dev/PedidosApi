@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace PedidosApiWebApplication.Modelos
 {
@@ -16,7 +17,7 @@ namespace PedidosApiWebApplication.Modelos
         public string cidadeCliente { get; set; }
         public string estadoCliente { get; set; }
         public string cepCliente { get; set; }
-        public string dataCadastroCliente { get; set; } //TROCAR PARA DATE
+        public DateTime dataCadastroCliente { get; set; } //TROCAR PARA DATE
         public ICollection<Pedido> Pedidos { get; set; }
     }
 }

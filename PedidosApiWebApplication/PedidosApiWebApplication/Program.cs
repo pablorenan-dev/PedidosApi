@@ -1,4 +1,15 @@
+using Microsoft.EntityFrameworkCore;
+using PedidosApiWebApplication.BancoDeDados;
+
 var builder = WebApplication.CreateBuilder(args);
+
+//obtem o endereco do banco de dados
+var connectionString = builder.Configuration.GetConnectionString("Conexao");
+
+builder.Services.AddDbContext<PedidosContext>(config =>
+{
+    config.UseSqlite(connectionString);
+});
 
 // Add services to the container.
 

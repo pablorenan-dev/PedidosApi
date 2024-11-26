@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PedidosApiWebApplication.BancoDeDados;
+using PedidosApiWebApplication.Dtos_data_transfer_object_;
 using PedidosApiWebApplication.Modelos;
 
 namespace PedidosApiWebApplication.Controllers
@@ -25,7 +26,20 @@ namespace PedidosApiWebApplication.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Cliente>>> GetClientes()
         {
-            return await _context.Clientes.ToListAsync();
+            var clientesSemCampoPedido = await _context.Clientes.Select(c => new ClienteDto
+            {
+                nomeCliente = c.nomeCliente,
+                sobrenomeCliente = c.sobrenomeCliente,
+                emailCliente = c.emailCliente,
+                telefoneCliente = c.telefoneCliente,
+                enderecoCliente = c.enderecoCliente,
+                cidadeCliente = c.cidadeCliente,
+                estadoCliente = c.estadoCliente,
+                cepCliente = c.cepCliente,
+                dataCadastroCliente = DateTime.Now
+            }).ToListAsync();
+
+            return Ok(clientesSemCampoPedido);
         }
 
         // GET: api/Clientes/5
@@ -76,12 +90,25 @@ namespace PedidosApiWebApplication.Controllers
         // POST: api/Clientes
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Cliente>> PostCliente(Cliente cliente)
+        public async Task<ActionResult<Cliente>> PostCliente(ClienteDto cliente)
         {
-            _context.Clientes.Add(cliente);
+            var novoCliente = new Cliente()
+            {
+                nomeCliente = cliente.nomeCliente,
+                sobrenomeCliente = cliente.sobrenomeCliente,
+                emailCliente = cliente.emailCliente,
+                telefoneCliente = cliente.telefoneCliente,
+                enderecoCliente = cliente.enderecoCliente,
+                cidadeCliente = cliente.cidadeCliente,
+                estadoCliente = cliente.estadoCliente,
+                cepCliente = cliente.cepCliente,
+                dataCadastroCliente = DateTime.Now
+            };
+
+            await _context.Clientes.AddAsync(novoCliente);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetCliente", new { id = cliente.idCliente }, cliente);
+            return CreatedAtAction("GetCliente", new { id = novoCliente.idCliente }, cliente);
         }
 
         // DELETE: api/Clientes/5
