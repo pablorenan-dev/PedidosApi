@@ -15,7 +15,7 @@ namespace PedidosApiWebApplication.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "9.0.0");
+            modelBuilder.HasAnnotation("ProductVersion", "8.0.4");
 
             modelBuilder.Entity("PedidosApiWebApplication.Modelos.Cliente", b =>
                 {
@@ -68,9 +68,6 @@ namespace PedidosApiWebApplication.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("PedidoidPedido")
-                        .HasColumnType("INTEGER");
-
                     b.Property<int>("idPedido")
                         .HasColumnType("INTEGER");
 
@@ -85,8 +82,6 @@ namespace PedidosApiWebApplication.Migrations
 
                     b.HasKey("idItemPedido");
 
-                    b.HasIndex("PedidoidPedido");
-
                     b.HasIndex("idPedido");
 
                     b.HasIndex("idProduto");
@@ -100,8 +95,7 @@ namespace PedidosApiWebApplication.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("dataPedido")
-                        .IsRequired()
+                    b.Property<DateTime>("dataPedido")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("idCliente")
@@ -151,20 +145,16 @@ namespace PedidosApiWebApplication.Migrations
 
             modelBuilder.Entity("PedidosApiWebApplication.Modelos.ItemPedido", b =>
                 {
-                    b.HasOne("PedidosApiWebApplication.Modelos.Pedido", null)
-                        .WithMany("itemPedidos")
-                        .HasForeignKey("PedidoidPedido");
-
                     b.HasOne("PedidosApiWebApplication.Modelos.Pedido", "Pedido")
-                        .WithMany()
+                        .WithMany("itemPedidos")
                         .HasForeignKey("idPedido")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("PedidosApiWebApplication.Modelos.Produto", "Produto")
                         .WithMany()
                         .HasForeignKey("idProduto")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Pedido");
@@ -177,7 +167,7 @@ namespace PedidosApiWebApplication.Migrations
                     b.HasOne("PedidosApiWebApplication.Modelos.Cliente", null)
                         .WithMany("Pedidos")
                         .HasForeignKey("idPedido")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
 

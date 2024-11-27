@@ -9,7 +9,7 @@ namespace PedidosApiWebApplication.Modelos
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int idPedido { get; set; }
         public int idCliente { get; set; } //FK
-        public string dataPedido { get; set; } //TROCAR PARA DATA
+        public DateTime dataPedido { get; set; } //TROCAR PARA DATA
         public string statusPedido { get; set; }
         public decimal valorTotalPedido { get; set; }
         public string observacoesPedido { get; set; }

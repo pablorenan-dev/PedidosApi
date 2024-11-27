@@ -1,11 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace PedidosApiWebApplication.Migrations
 {
     /// <inheritdoc />
-    public partial class criacao : Migration
+    public partial class criacao1 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -24,27 +25,11 @@ namespace PedidosApiWebApplication.Migrations
                     cidadeCliente = table.Column<string>(type: "TEXT", nullable: false),
                     estadoCliente = table.Column<string>(type: "TEXT", nullable: false),
                     cepCliente = table.Column<string>(type: "TEXT", nullable: false),
-                    dataCadastroCliente = table.Column<string>(type: "TEXT", nullable: false)
+                    dataCadastroCliente = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Clientes", x => x.idCliente);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ItemPedidos",
-                columns: table => new
-                {
-                    idItemPedido = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    idPedido = table.Column<int>(type: "INTEGER", nullable: false),
-                    idProduto = table.Column<int>(type: "INTEGER", nullable: false),
-                    quantidadeItemPedido = table.Column<int>(type: "INTEGER", nullable: false),
-                    precoUnitarioItemPedido = table.Column<float>(type: "REAL", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ItemPedidos", x => x.idItemPedido);
                 });
 
             migrationBuilder.CreateTable(
@@ -70,7 +55,7 @@ namespace PedidosApiWebApplication.Migrations
                     idPedido = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     idCliente = table.Column<int>(type: "INTEGER", nullable: false),
-                    dataPedido = table.Column<string>(type: "TEXT", nullable: false),
+                    dataPedido = table.Column<DateTime>(type: "TEXT", nullable: false),
                     statusPedido = table.Column<string>(type: "TEXT", nullable: false),
                     valorTotalPedido = table.Column<decimal>(type: "TEXT", nullable: false),
                     observacoesPedido = table.Column<string>(type: "TEXT", nullable: false)
@@ -82,9 +67,44 @@ namespace PedidosApiWebApplication.Migrations
                         name: "FK_Pedidos_Clientes_idPedido",
                         column: x => x.idPedido,
                         principalTable: "Clientes",
-                        principalColumn: "idCliente",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "idCliente");
                 });
+
+            migrationBuilder.CreateTable(
+                name: "ItemPedidos",
+                columns: table => new
+                {
+                    idItemPedido = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    idPedido = table.Column<int>(type: "INTEGER", nullable: false),
+                    idProduto = table.Column<int>(type: "INTEGER", nullable: false),
+                    quantidadeItemPedido = table.Column<int>(type: "INTEGER", nullable: false),
+                    precoUnitarioItemPedido = table.Column<float>(type: "REAL", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ItemPedidos", x => x.idItemPedido);
+                    table.ForeignKey(
+                        name: "FK_ItemPedidos_Pedidos_idPedido",
+                        column: x => x.idPedido,
+                        principalTable: "Pedidos",
+                        principalColumn: "idPedido");
+                    table.ForeignKey(
+                        name: "FK_ItemPedidos_Produtos_idProduto",
+                        column: x => x.idProduto,
+                        principalTable: "Produtos",
+                        principalColumn: "idProduto");
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ItemPedidos_idPedido",
+                table: "ItemPedidos",
+                column: "idPedido");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ItemPedidos_idProduto",
+                table: "ItemPedidos",
+                column: "idProduto");
         }
 
         /// <inheritdoc />

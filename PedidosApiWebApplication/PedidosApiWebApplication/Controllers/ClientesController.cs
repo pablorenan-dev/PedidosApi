@@ -28,6 +28,7 @@ namespace PedidosApiWebApplication.Controllers
         {
             var clientesSemCampoPedido = await _context.Clientes.Select(c => new ClienteDto
             {
+                idCliente = c.idCliente,
                 nomeCliente = c.nomeCliente,
                 sobrenomeCliente = c.sobrenomeCliente,
                 emailCliente = c.emailCliente,

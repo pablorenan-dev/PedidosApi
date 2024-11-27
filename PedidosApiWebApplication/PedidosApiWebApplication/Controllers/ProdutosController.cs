@@ -80,21 +80,7 @@ namespace PedidosApiWebApplication.Controllers
         }
 
         // DELETE: api/Produtos/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteProduto(int id)
-        {
-            var produto = await _context.Produtos.FindAsync(id);
-            if (produto == null)
-            {
-                return NotFound();
-            }
-
-            _context.Produtos.Remove(produto);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
+     
         private bool ProdutoExists(int id)
         {
             return _context.Produtos.Any(e => e.idProduto == id);

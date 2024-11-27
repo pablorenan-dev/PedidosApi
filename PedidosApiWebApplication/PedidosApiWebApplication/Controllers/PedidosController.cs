@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using PedidosApiWebApplication.BancoDeDados;
 using PedidosApiWebApplication.Dtos_data_transfer_object_;
 using PedidosApiWebApplication.Modelos;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace PedidosApiWebApplication.Controllers
 {
@@ -26,7 +27,27 @@ namespace PedidosApiWebApplication.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Pedido>>> GetPedidos()
         {
-            return await _context.Pedidos.ToListAsync();
+            //SELECT c.NumeroMesa, c.NomeCliente FROM Comandas WHERE SituacaoComanda = 1
+
+            var resultPedidos = await _context.Pedidos
+                .Include(p => p.itemPedidos)
+                .Select(p => new PedidoGetDto
+                {
+                    idCliente = p.idCliente,
+                    dataPedido = p.dataPedido,
+                    statusPedido = p.statusPedido,
+                    valorTotalPedido = p.valorTotalPedido,
+                    observacoesPedido = p.observacoesPedido,
+                    itensPedido = p.itemPedidos.Select(ip => new ItensPedidoGetDto
+                    {
+                        idItemPedido = ip.idItemPedido,
+                        nomeProduto = ip.Produto.nomeProduto,
+                    }
+                                    ).ToList()
+                })
+                .ToListAsync();
+            //retorna o conteudo com a lista de comandas
+            return Ok(resultPedidos);
         }
 
         // GET: api/Pedidos/5
@@ -74,6 +95,9 @@ namespace PedidosApiWebApplication.Controllers
             return NoContent();
         }
 
+        // PUT: api/Pedidos/5
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+
         // POST: api/Pedidos
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
@@ -82,13 +106,35 @@ namespace PedidosApiWebApplication.Controllers
             var novoPedido = new Pedido()
             {
                 idCliente = pedido.idCliente,
-                dataPedido = pedido.dataPedido,
+                dataPedido = DateTime.Now,
                 statusPedido = pedido.statusPedido,
                 valorTotalPedido = pedido.valorTotalPedido,
                 observacoesPedido = pedido.observacoesPedido,
             };
 
-            _context.Pedidos.Add(novoPedido);
+            await _context.Pedidos.AddAsync(novoPedido);
+           
+
+            foreach (var item in pedido.itensPedido)
+            {
+                //var cardapioItem = await _context.CardapioItems.FindAsync(comanda.CardapioItems[0]);
+                var novoItemComanda = new ItemPedido()
+                {
+                    Pedido = novoPedido,
+                    idProduto = item
+                };
+
+                // adicionando o novo item na comanda
+                await _context.ItemPedidos.AddAsync(novoItemComanda);
+
+                // verificar se o cardapio possui preparo
+                // SELECT PossuiPreparo From Cardapioitem Where id = <item>
+                // Find pode retornar nulo
+                // First nao retorna nulo, pega sempre o primeiro
+
+             
+            }
+
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetPedido", new { id = novoPedido.idPedido }, pedido);
