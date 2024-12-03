@@ -123,8 +123,7 @@ namespace PedidosApiWebApplication.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("dataProduto")
-                        .IsRequired()
+                    b.Property<DateTime?>("dataProduto")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("descricaoProduto")
@@ -136,6 +135,9 @@ namespace PedidosApiWebApplication.Migrations
 
                     b.Property<string>("nomeProduto")
                         .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("precoProduto")
                         .HasColumnType("TEXT");
 
                     b.HasKey("idProduto");

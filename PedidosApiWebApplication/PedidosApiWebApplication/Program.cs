@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using PedidosApiWebApplication;
 using PedidosApiWebApplication.BancoDeDados;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,6 +20,16 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+using (var e = app.Services.CreateScope())
+{
+    // obtendo todas as tabelas do banco
+    var banco = e.ServiceProvider.GetRequiredService<PedidosContext>();
+
+    banco.Database.Migrate();
+    // Semear os dados inicias
+    InicializarDados.Semear(banco);
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

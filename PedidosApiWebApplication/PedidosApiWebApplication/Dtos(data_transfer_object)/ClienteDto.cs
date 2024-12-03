@@ -3,7 +3,7 @@
     public class ClienteDto
     {
         public int idCliente { get; set; }
-        public string nomeCliente { get; set; }
+        public string? nomeCliente { get; set; }
         public string sobrenomeCliente { get; set; }
         public string emailCliente { get; set; }
         public decimal telefoneCliente { get; set; }

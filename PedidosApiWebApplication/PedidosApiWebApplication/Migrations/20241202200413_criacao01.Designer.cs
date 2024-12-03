@@ -11,8 +11,8 @@ using PedidosApiWebApplication.BancoDeDados;
 namespace PedidosApiWebApplication.Migrations
 {
     [DbContext(typeof(PedidosContext))]
-    [Migration("20241127012412_criacao1")]
-    partial class criacao1
+    [Migration("20241202200413_criacao01")]
+    partial class criacao01
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -126,8 +126,7 @@ namespace PedidosApiWebApplication.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("dataProduto")
-                        .IsRequired()
+                    b.Property<DateTime?>("dataProduto")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("descricaoProduto")
@@ -139,6 +138,9 @@ namespace PedidosApiWebApplication.Migrations
 
                     b.Property<string>("nomeProduto")
                         .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("precoProduto")
                         .HasColumnType("TEXT");
 
                     b.HasKey("idProduto");

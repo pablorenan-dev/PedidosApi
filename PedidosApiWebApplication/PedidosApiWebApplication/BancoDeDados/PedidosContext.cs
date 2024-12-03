@@ -21,13 +21,13 @@ namespace PedidosApiWebApplication.BancoDeDados
                  .HasOne<Cliente>()
                  .WithMany(c => c.Pedidos)
                  .HasForeignKey(f => f.idPedido)
-                 .OnDelete(DeleteBehavior.NoAction);
+                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Pedido>()
                 .HasMany<ItemPedido>()
                 .WithOne(ip => ip.Pedido)
-                .HasForeignKey(f => f.idPedido)
-                .OnDelete(DeleteBehavior.NoAction);
+                .HasForeignKey(f => f.idPedido);
+                //.OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<ItemPedido>()
                 .HasOne(ip => ip.Pedido)

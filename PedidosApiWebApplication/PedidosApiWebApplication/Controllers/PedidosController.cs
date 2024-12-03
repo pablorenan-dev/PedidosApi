@@ -33,6 +33,7 @@ namespace PedidosApiWebApplication.Controllers
                 .Include(p => p.itemPedidos)
                 .Select(p => new PedidoGetDto
                 {
+                    idPedido = p.idPedido,
                     idCliente = p.idCliente,
                     dataPedido = p.dataPedido,
                     statusPedido = p.statusPedido,
@@ -52,29 +53,81 @@ namespace PedidosApiWebApplication.Controllers
 
         // GET: api/Pedidos/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Pedido>> GetPedido(int id)
+        public async Task<ActionResult<PedidoGetDto>> GetPedido(int id)
         {
-            var pedido = await _context.Pedidos.FindAsync(id);
 
-            if (pedido == null)
+            var resultPedidos = await _context.Pedidos
+                .Include(p => p.itemPedidos)
+                .Where(p => p.idPedido == id)
+                .Select(p => new PedidoGetDto
+                {
+                    idCliente = p.idCliente,
+                    dataPedido = p.dataPedido,
+                    statusPedido = p.statusPedido,
+                    valorTotalPedido = p.valorTotalPedido,
+                    observacoesPedido = p.observacoesPedido,
+                    itensPedido = p.itemPedidos.Select(ip => new ItensPedidoGetDto
+                    {
+                        idItemPedido = ip.idItemPedido,
+                        nomeProduto = ip.Produto.nomeProduto,
+                    }
+                                    ).ToList()
+                })
+                .FirstOrDefaultAsync();
+
+            if (resultPedidos == null)
             {
                 return NotFound();
             }
 
-            return pedido;
+            return resultPedidos;
         }
 
         // PUT: api/Pedidos/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutPedido(int id, Pedido pedido)
+        public async Task<IActionResult> PutPedido(int id, PedidoPutDto pedido)
         {
-            if (id != pedido.idPedido)
+
+            var pedidoASerAtualizado = await _context.Pedidos
+                .FirstAsync(p => p.idPedido == id);
+
+            if(pedidoASerAtualizado == null)
             {
-                return BadRequest();
+                return BadRequest("Pedido com esse id não existe...");
             }
 
-            _context.Entry(pedido).State = EntityState.Modified;
+            var clienteProcurarNoBanco = await _context.Clientes.FindAsync(pedido.idCliente);
+
+            if(clienteProcurarNoBanco == null)
+            {
+                return BadRequest("Cliente com esse id não existe");
+            }
+
+            pedidoASerAtualizado.idCliente = pedido.idCliente;
+            pedidoASerAtualizado.statusPedido = pedido.statusPedido;
+            pedidoASerAtualizado.dataPedido = pedido.dataPedido;
+            pedidoASerAtualizado.observacoesPedido = pedido.observacoesPedido;
+            
+            foreach(var item in pedido.itensPedido)
+            {
+                if(item.incluir == true)
+                {
+                    var novoItemPedido = new ItemPedido()
+                    {
+                        Pedido = pedidoASerAtualizado,
+                        idProduto = item.idProduto
+                    };
+
+                    await _context.AddAsync(novoItemPedido);
+                }
+                if(item.excluir == true)
+                {
+                    var pedidoItemExcluir = await _context.ItemPedidos
+                        .FirstAsync(pi => pi.idItemPedido == item.idItemPedido);
+                    _context.ItemPedidos.Remove(pedidoItemExcluir);
+                }
+            }
 
             try
             {
@@ -103,6 +156,14 @@ namespace PedidosApiWebApplication.Controllers
         [HttpPost]
         public async Task<ActionResult<Pedido>> PostPedido(PedidoDto pedido)
         {
+            // Verificar se o cliente existe
+            var ClienteNoBanco = await _context.Clientes.FindAsync(pedido.idCliente);
+            if (ClienteNoBanco == null)
+            {
+                return BadRequest("Cliente com esse id não existe...");
+            }
+
+            // Criar o novo pedido
             var novoPedido = new Pedido()
             {
                 idCliente = pedido.idCliente,
@@ -112,35 +173,38 @@ namespace PedidosApiWebApplication.Controllers
                 observacoesPedido = pedido.observacoesPedido,
             };
 
+            // Adicionar o pedido e salvar para obter o idPedido
             await _context.Pedidos.AddAsync(novoPedido);
-           
+            await _context.SaveChangesAsync(); // Salvar para gerar o idPedido
 
+            // Iterar sobre os itens do pedido
             foreach (var item in pedido.itensPedido)
             {
-                //var cardapioItem = await _context.CardapioItems.FindAsync(comanda.CardapioItems[0]);
+                // Verificar se o produto existe
+                var produtoExistente = await _context.Produtos.FindAsync(item);
+                if (produtoExistente == null)
+                {
+                    return BadRequest($"Produto com o id {item} não existe.");
+                }
+
+                // Criar e adicionar o item do pedido
                 var novoItemComanda = new ItemPedido()
                 {
-                    Pedido = novoPedido,
+                    idPedido = novoPedido.idPedido, // Associar ao pedido salvo
                     idProduto = item
                 };
 
-                // adicionando o novo item na comanda
                 await _context.ItemPedidos.AddAsync(novoItemComanda);
-
-                // verificar se o cardapio possui preparo
-                // SELECT PossuiPreparo From Cardapioitem Where id = <item>
-                // Find pode retornar nulo
-                // First nao retorna nulo, pega sempre o primeiro
-
-             
             }
 
+            // Salvar os itens do pedido
             await _context.SaveChangesAsync();
 
+            // Retornar o pedido criado
             return CreatedAtAction("GetPedido", new { id = novoPedido.idPedido }, pedido);
         }
 
-        // DELETE: api/Pedidos/5
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePedido(int id)
         {
@@ -150,11 +214,18 @@ namespace PedidosApiWebApplication.Controllers
                 return NotFound();
             }
 
+            // Remover os itens diretamente com SQL
+            await _context.Database.ExecuteSqlRawAsync("DELETE FROM ItemPedidos WHERE idPedido = {0}", id);
+
+            // Remover o pedido
             _context.Pedidos.Remove(pedido);
+
+            // Salvar as mudanças
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
+
 
         private bool PedidoExists(int id)
         {

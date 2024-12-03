@@ -4,6 +4,7 @@ namespace PedidosApiWebApplication.Dtos_data_transfer_object_
 {
     public class PedidoGetDto
     {
+        public int idPedido { get; set; }
         public int idCliente { get; set; } //FK
         public DateTime dataPedido { get; set; }
         public string statusPedido { get; set; }

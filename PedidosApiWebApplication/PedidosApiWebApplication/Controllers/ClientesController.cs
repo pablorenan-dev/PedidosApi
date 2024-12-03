@@ -45,29 +45,57 @@ namespace PedidosApiWebApplication.Controllers
 
         // GET: api/Clientes/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Cliente>> GetCliente(int id)
+        public async Task<ActionResult<ClienteDto>> GetCliente(int id)
         {
-            var cliente = await _context.Clientes.FindAsync(id);
+            //var cliente = await _context.Clientes.FindAsync(id);
+            var clientesSemCampoPedido = await _context.Clientes.Where(c => c.idCliente == id)
+                .Select(c => new ClienteDto
+                {
+                    idCliente = c.idCliente,
+                    nomeCliente = c.nomeCliente,
+                    sobrenomeCliente = c.sobrenomeCliente,
+                    emailCliente = c.emailCliente,
+                    telefoneCliente = c.telefoneCliente,
+                    enderecoCliente = c.enderecoCliente,
+                    cidadeCliente = c.cidadeCliente,
+                    estadoCliente = c.estadoCliente,
+                    cepCliente = c.cepCliente,
+                    dataCadastroCliente = c.dataCadastroCliente,
+                }).FirstOrDefaultAsync();
 
-            if (cliente == null)
+            if (clientesSemCampoPedido == null)
             {
                 return NotFound();
             }
 
-            return cliente;
+            return clientesSemCampoPedido;
         }
 
         // PUT: api/Clientes/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutCliente(int id, Cliente cliente)
+        public async Task<IActionResult> PutCliente(int id, ClienteDto cliente)
         {
             if (id != cliente.idCliente)
             {
                 return BadRequest();
             }
 
-            _context.Entry(cliente).State = EntityState.Modified;
+            //pega o cliente atual
+            var clienteAtual = await _context.Clientes
+                .FirstOrDefaultAsync(c => c.idCliente == id);
+
+            clienteAtual.nomeCliente = cliente.nomeCliente;
+            clienteAtual.sobrenomeCliente = cliente.sobrenomeCliente;
+            clienteAtual.emailCliente = cliente.emailCliente;
+            clienteAtual.telefoneCliente = cliente.telefoneCliente;
+            clienteAtual.enderecoCliente = cliente.enderecoCliente;
+            clienteAtual.cidadeCliente = cliente.cidadeCliente;
+            clienteAtual.estadoCliente = cliente.estadoCliente;
+            clienteAtual.cepCliente = cliente.cepCliente;
+            clienteAtual.dataCadastroCliente = cliente.dataCadastroCliente;
+
+            _context.Entry(clienteAtual).State = EntityState.Modified;
 
             try
             {

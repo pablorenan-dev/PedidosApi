@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace PedidosApiWebApplication.Migrations
 {
     /// <inheritdoc />
-    public partial class criacao1 : Migration
+    public partial class criacao01 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -40,8 +40,9 @@ namespace PedidosApiWebApplication.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     nomeProduto = table.Column<string>(type: "TEXT", nullable: false),
                     descricaoProduto = table.Column<string>(type: "TEXT", nullable: false),
+                    precoProduto = table.Column<decimal>(type: "TEXT", nullable: false),
                     estoqueProduto = table.Column<int>(type: "INTEGER", nullable: false),
-                    dataProduto = table.Column<string>(type: "TEXT", nullable: false)
+                    dataProduto = table.Column<DateTime>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
