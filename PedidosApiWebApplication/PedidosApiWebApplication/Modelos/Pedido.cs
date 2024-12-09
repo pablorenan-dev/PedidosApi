@@ -14,5 +14,6 @@ namespace PedidosApiWebApplication.Modelos
         public decimal valorTotalPedido { get; set; }
         public string observacoesPedido { get; set; }
         public ICollection<ItemPedido> itemPedidos { get; set;} //IColletion eh o pai
+        public virtual Cliente Cliente { get; set; }
     }
 }

@@ -54,7 +54,8 @@ namespace PedidosApiWebApplication.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<decimal>("telefoneCliente")
+                    b.Property<string>("telefoneCliente")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("idCliente");
@@ -114,6 +115,8 @@ namespace PedidosApiWebApplication.Migrations
 
                     b.HasKey("idPedido");
 
+                    b.HasIndex("idCliente");
+
                     b.ToTable("Pedidos");
                 });
 
@@ -166,11 +169,19 @@ namespace PedidosApiWebApplication.Migrations
 
             modelBuilder.Entity("PedidosApiWebApplication.Modelos.Pedido", b =>
                 {
+                    b.HasOne("PedidosApiWebApplication.Modelos.Cliente", "Cliente")
+                        .WithMany()
+                        .HasForeignKey("idCliente")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("PedidosApiWebApplication.Modelos.Cliente", null)
                         .WithMany("Pedidos")
                         .HasForeignKey("idPedido")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Cliente");
                 });
 
             modelBuilder.Entity("PedidosApiWebApplication.Modelos.Cliente", b =>

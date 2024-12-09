@@ -7,7 +7,7 @@ namespace PedidosApiWebApplication.BancoDeDados
     {
         public PedidosContext(DbContextOptions<PedidosContext> options)
             : base(options)
-        {
+        { 
         }
 
         public DbSet<Cliente> Clientes { get; set; }
@@ -22,6 +22,12 @@ namespace PedidosApiWebApplication.BancoDeDados
                  .WithMany(c => c.Pedidos)
                  .HasForeignKey(f => f.idPedido)
                  .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Cliente>()
+                .HasMany<Pedido>()
+                .WithOne(p => p.Cliente)
+                .HasForeignKey(f => f.idCliente)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Pedido>()
                 .HasMany<ItemPedido>()

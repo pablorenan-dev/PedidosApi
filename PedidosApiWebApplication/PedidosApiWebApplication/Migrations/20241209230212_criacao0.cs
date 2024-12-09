@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace PedidosApiWebApplication.Migrations
 {
     /// <inheritdoc />
-    public partial class criacao01 : Migration
+    public partial class criacao0 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -20,7 +20,7 @@ namespace PedidosApiWebApplication.Migrations
                     nomeCliente = table.Column<string>(type: "TEXT", nullable: false),
                     sobrenomeCliente = table.Column<string>(type: "TEXT", nullable: false),
                     emailCliente = table.Column<string>(type: "TEXT", nullable: false),
-                    telefoneCliente = table.Column<decimal>(type: "TEXT", nullable: false),
+                    telefoneCliente = table.Column<string>(type: "TEXT", nullable: false),
                     enderecoCliente = table.Column<string>(type: "TEXT", nullable: false),
                     cidadeCliente = table.Column<string>(type: "TEXT", nullable: false),
                     estadoCliente = table.Column<string>(type: "TEXT", nullable: false),
@@ -65,10 +65,17 @@ namespace PedidosApiWebApplication.Migrations
                 {
                     table.PrimaryKey("PK_Pedidos", x => x.idPedido);
                     table.ForeignKey(
+                        name: "FK_Pedidos_Clientes_idCliente",
+                        column: x => x.idCliente,
+                        principalTable: "Clientes",
+                        principalColumn: "idCliente",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
                         name: "FK_Pedidos_Clientes_idPedido",
                         column: x => x.idPedido,
                         principalTable: "Clientes",
-                        principalColumn: "idCliente");
+                        principalColumn: "idCliente",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -106,6 +113,11 @@ namespace PedidosApiWebApplication.Migrations
                 name: "IX_ItemPedidos_idProduto",
                 table: "ItemPedidos",
                 column: "idProduto");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Pedidos_idCliente",
+                table: "Pedidos",
+                column: "idCliente");
         }
 
         /// <inheritdoc />

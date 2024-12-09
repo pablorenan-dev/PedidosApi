@@ -11,8 +11,8 @@ using PedidosApiWebApplication.BancoDeDados;
 namespace PedidosApiWebApplication.Migrations
 {
     [DbContext(typeof(PedidosContext))]
-    [Migration("20241202200413_criacao01")]
-    partial class criacao01
+    [Migration("20241209230212_criacao0")]
+    partial class criacao0
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -57,7 +57,8 @@ namespace PedidosApiWebApplication.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<decimal>("telefoneCliente")
+                    b.Property<string>("telefoneCliente")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("idCliente");
@@ -117,6 +118,8 @@ namespace PedidosApiWebApplication.Migrations
 
                     b.HasKey("idPedido");
 
+                    b.HasIndex("idCliente");
+
                     b.ToTable("Pedidos");
                 });
 
@@ -169,11 +172,19 @@ namespace PedidosApiWebApplication.Migrations
 
             modelBuilder.Entity("PedidosApiWebApplication.Modelos.Pedido", b =>
                 {
+                    b.HasOne("PedidosApiWebApplication.Modelos.Cliente", "Cliente")
+                        .WithMany()
+                        .HasForeignKey("idCliente")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("PedidosApiWebApplication.Modelos.Cliente", null)
                         .WithMany("Pedidos")
                         .HasForeignKey("idPedido")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Cliente");
                 });
 
             modelBuilder.Entity("PedidosApiWebApplication.Modelos.Cliente", b =>
