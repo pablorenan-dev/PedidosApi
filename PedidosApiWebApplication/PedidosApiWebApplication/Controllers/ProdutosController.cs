@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PedidosApiWebApplication.BancoDeDados;
 using PedidosApiWebApplication.Modelos;
@@ -7,6 +8,7 @@ namespace PedidosApiWebApplication.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ProdutosController : ControllerBase
     {
         private readonly PedidosContext _context;
